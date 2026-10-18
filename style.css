@@ -253,6 +253,14 @@ p { text-wrap: pretty; }
   object-position: 50% 50%;
   background: #0b1a26;
 }
+/* never show a play button over the footage (iOS shows one when battery saver blocks autoplay) */
+.hero-video::-webkit-media-controls,
+.hero-video::-webkit-media-controls-start-playback-button,
+.hero-video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+.hero-video { pointer-events: none; }
 .hero-shade {
   position: absolute;
   inset: 0;
@@ -262,44 +270,6 @@ p { text-wrap: pretty; }
     linear-gradient(0deg, rgba(8, 20, 30, 0.82) 0%, rgba(8, 20, 30, 0) 34%),
     linear-gradient(180deg, rgba(8, 20, 30, 0.55) 0%, rgba(8, 20, 30, 0) 22%);
 }
-.hero-pause {
-  position: absolute;
-  z-index: 2;
-  top: calc(var(--nav-h) + 0.75rem);
-  right: var(--gutter);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.8rem 0.4rem 0.65rem;
-  font: inherit;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
-  background: rgba(8, 20, 30, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 2px;
-  cursor: pointer;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-}
-.hero-pause::before {
-  /* pause glyph: two bars; swaps to a play triangle when paused */
-  content: "";
-  width: 9px;
-  height: 10px;
-  border-left: 3px solid currentColor;
-  border-right: 3px solid currentColor;
-  box-sizing: border-box;
-}
-.hero-pause[aria-pressed="true"]::before {
-  width: 0;
-  height: 0;
-  border-right: 0;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-left: 9px solid currentColor;
-}
-.hero-pause:hover { color: #fff; border-color: rgba(255, 255, 255, 0.7); }
 .hero-content {
   align-self: center;
   width: 100%;
@@ -368,15 +338,6 @@ p { text-wrap: pretty; }
   .tb-cell:last-child { grid-column: 1 / -1; border-left: 0; }
 }
 @media (max-width: 700px) {
-  /* on phones the headline runs full width, so the pause button drops into the flow below the buttons */
-  .hero { grid-template-rows: 1fr auto auto; }
-  .hero-pause {
-    position: relative;
-    top: auto;
-    right: auto;
-    justify-self: end;
-    margin: 0 var(--gutter) 0.9rem;
-  }
   .hero-shade {
     background:
       linear-gradient(180deg, rgba(8, 20, 30, 0.72) 0%, rgba(8, 20, 30, 0.58) 45%, rgba(8, 20, 30, 0.9) 100%);
@@ -917,7 +878,7 @@ p { text-wrap: pretty; }
 
 /* ---------- Print ---------- */
 @media print {
-  .site-nav, .hero-pause, .form-dialog { display: none !important; }
+  .site-nav, .form-dialog { display: none !important; }
   .hero { min-height: auto; color: var(--ink); background: none; }
   .hero-video, .hero-shade { display: none; }
   .title-block { color: var(--ink); background: none; border-color: var(--ink); }
