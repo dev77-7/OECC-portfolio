@@ -22,7 +22,7 @@
   <link rel="manifest" href="site.webmanifest">
 
   <link rel="preload" href="assets/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/img/plant-twilight-1600.webp" as="image" type="image/webp" media="(min-width: 700px)">
+  <link rel="preload" href="assets/video/hero-aerial-poster.webp" as="image" type="image/webp">
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 
@@ -66,44 +66,15 @@
 
     <!-- ============ 1. Hero ============ -->
     <section class="hero" id="top" aria-labelledby="hero-title">
-      <!-- EDIT: replace with a real HD photo (min. 2400px wide) of your site manager at a plant.
-           Put it at /assets/img/hero.webp + hero.jpg, update the two sources below and delete the .hero-figure SVG. -->
-      <picture class="hero-photo">
-        <source media="(min-width: 700px)" srcset="assets/img/plant-twilight-1600.webp" type="image/webp">
-        <source srcset="assets/img/plant-twilight-900.webp" type="image/webp">
-        <img src="assets/img/plant-twilight-1600.jpg" alt="Nuclear power station with cooling towers at dusk" width="1600" height="1066" fetchpriority="high">
-      </picture>
-
-      <!-- Construction manager in a hard hat, seen from behind, looking at the plant -->
-      <svg class="hero-figure" viewBox="0 0 420 520" aria-hidden="true" focusable="false">
-        <defs>
-          <linearGradient id="rim" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stop-color="#ffb46b" stop-opacity=".95"/>
-            <stop offset=".28" stop-color="#ff9a3c" stop-opacity=".25"/>
-            <stop offset=".6" stop-color="#ff9a3c" stop-opacity="0"/>
-          </linearGradient>
-          <linearGradient id="body" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stop-color="#16222c"/>
-            <stop offset="1" stop-color="#05090d"/>
-          </linearGradient>
-          <linearGradient id="hat" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stop-color="#5d6a73"/>
-            <stop offset=".45" stop-color="#26323b"/>
-            <stop offset="1" stop-color="#121a21"/>
-          </linearGradient>
-        </defs>
-        <!-- torso, neck and head -->
-        <path fill="url(#body)" d="M0,520 L0,404 C2,352 40,322 104,306 C138,298 160,288 172,276 C177,268 178,256 176,242 C164,232 158,214 158,194 C158,160 182,138 212,138 C242,138 264,160 264,194 C264,214 258,232 246,242 C244,256 245,268 250,276 C262,288 284,298 318,306 C382,322 418,352 420,404 L420,520 Z"/>
-        <!-- hi-vis vest: two reflective bands across the back -->
-        <path fill="#d7dee2" opacity=".2" d="M8,372 C120,356 300,356 412,372 L413,386 C300,370 120,370 7,386 Z"/>
-        <path fill="#d7dee2" opacity=".16" d="M4,414 C120,398 300,398 416,414 L417,426 C300,410 120,410 3,426 Z"/>
-        <!-- hard hat: dome, ridge and brim -->
-        <path fill="url(#hat)" d="M160,184 C158,134 184,104 211,104 C238,104 264,134 262,184 Z"/>
-        <path fill="#3a4750" d="M205,104 C206,98 216,98 217,104 L219,184 L203,184 Z" opacity=".7"/>
-        <path fill="url(#hat)" d="M138,186 C150,176 272,176 284,186 C276,196 146,196 138,186 Z"/>
-        <!-- warm rim light from the plant -->
-        <path fill="none" stroke="url(#rim)" stroke-width="3" d="M0,404 C2,352 40,322 104,306 C138,298 160,288 172,276 C177,268 178,256 176,242 C164,232 158,214 158,194 M160,184 C158,134 184,104 211,104 M138,186 C150,176 200,174 211,175"/>
-      </svg>
+      <!-- Hero footage: drone push-in between two cooling towers, upscaled to HD and looped (assets/video/hero-aerial-*).
+           Muted + playsinline so it autoplays on phones; the poster is the loop's first frame, so first paint matches playback. -->
+      <video class="hero-video" autoplay muted loop playsinline preload="auto"
+             poster="assets/video/hero-aerial-poster.webp" aria-hidden="true" data-hero-video>
+        <source src="assets/video/hero-aerial-1080.webm" type="video/webm" media="(min-width: 900px)">
+        <source src="assets/video/hero-aerial-1080.mp4" type="video/mp4" media="(min-width: 900px)">
+        <source src="assets/video/hero-aerial-720.webm" type="video/webm">
+        <source src="assets/video/hero-aerial-720.mp4" type="video/mp4">
+      </video>
 
       <div class="hero-shade" aria-hidden="true"></div>
 
@@ -112,21 +83,24 @@
           <span class="line">The power is nuclear.</span>
           <span class="line">The foundation is ours.</span>
         </h1>
-        <p class="hero-lede">For moroe than four decades OECC has built civil structures and fabricated mechanical systems for NPCIL at five of India's nuclear power stations.</p>
+        <p class="hero-lede">For four decades OECC has built civil structures and fabricated mechanical systems for NPCIL at five of India's nuclear power stations. The second generation is taking the company further.</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#contact">Contact us</a>
           <a class="btn btn-ghost" href="#projects">See our NPCIL projects</a>
         </div>
       </div>
 
+      <button type="button" class="hero-pause" data-hero-pause aria-pressed="false">Pause video</button>
+
       <!-- Drawing title block: identifies the company the way a title block identifies a drawing -->
-     <!--- <dl class="title-block">
+      <dl class="title-block">
         <div class="tb-cell tb-wide"><dt>Company</dt><dd>Om Engineering Construction Company</dd></div>
         <div class="tb-cell"><dt>Works</dt><dd>Civil construction and mechanical fabrication</dd></div>
         <div class="tb-cell"><dt>Client</dt><dd>NPCIL</dd></div>
+        <!-- EDIT: confirm founding year -->
         <div class="tb-cell"><dt>Established</dt><dd data-founded>1986</dd></div>
         <div class="tb-cell"><dt>Sites</dt><dd>Rawatbhata, Narora, Kakrapar, Kudankulam, Kaiga</dd></div>
-      </dl> --->
+      </dl>
     </section>
 
     <!-- ============ 2. Sustainability ============ -->
@@ -373,7 +347,8 @@
 
   <footer class="site-footer">
     <div class="wrap footer-inner">
-      <p>© <span data-year>2026</span> <a href = "mailto:testemail@email.com"> (OECC) </a> Om Engineering Construction Company. All rights reserved.</p>
+      <p>© <span data-year>2026</span> Om Engineering Construction Company (OECC). All rights reserved.</p>
+      <p class="footer-small">NPCIL is the Nuclear Power Corporation of India Limited. Station names are used to describe OECC's project history. Charts cite their sources beneath each figure.</p>
     </div>
   </footer>
 </body>

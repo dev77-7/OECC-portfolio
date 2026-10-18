@@ -9,8 +9,9 @@ script.js             charts, map/list linking, enquiry-form dialog, nav (no dep
 404.html              not-found page
 favicon.ico  robots.txt  sitemap.xml  site.webmanifest
 assets/fonts/         Archivo variable font (self-hosted, SIL Open Font License)
-assets/img/           hero photo (WebP + JPEG, 900 and 1600 px), logo and icon sizes, social preview image
-assets/video/         sunrise cooling-tower clip (MP4 + WebM, 145 KB together, converted from the 2.6 MB GIF) and its poster
+assets/img/           logo and icon sizes, social preview image
+assets/video/         hero-aerial-*: the hero loop (1080p and 720p, MP4 + WebM) and its poster frame
+                      towers-sunrise*: sunrise cooling-tower clip for the sustainability section, and its poster
 deploy/               EC2 setup, deploy script and nginx config (never uploaded to the web root)
 ```
 
@@ -29,12 +30,21 @@ Unfinished text is wrapped in `<span class="fill-in">[...]</span>` and shows wit
 | Contact, `href="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform"` | Your Google Form link (Google Forms: **Send** > link icon > copy). Until it is set, the button falls back to email. |
 | `<head>` canonical, `og:url`, `og:image`, JSON-LD, plus `robots.txt` and `sitemap.xml` | Your real domain, if it is not `www.oecc.co.in` |
 
-### Images to replace
+### Hero video and other media
 
-- **Hero photo.** The brief asks for an HD photo of a construction manager looking at a nuclear plant. The only plant image supplied is a 626 px Freepik preview, so the hero currently pairs it with a drawn silhouette of a manager in a hard hat. For launch, use a real photo at least 2400 px wide (ideally your own site manager at an NPCIL site, if photography is permitted, or a licensed stock photo). Save it as `assets/img/hero-2400.webp` / `.jpg`, point the `<picture>` sources in the hero at it, and delete the `<svg class="hero-figure">` block.
-- **Licences.** The Freepik image needs the "Freepik" credit that is in the footer (free licence) or a premium licence. Check the source and licence of the sunrise cooling-tower clip (`nuclear-plant-sr.gif`, used in the sustainability section) before publishing.
-- **Not used:** `nuclear-plant-90s.gif` shows an oil refinery with smokestacks, which undercuts the clean-energy message. `nuclear-plant-slow.gif` (aerial towers) is 420 px wide, too small for a full-width slot; drop it in later if you find a use for it.
-- The plant photo and clip show foreign stations, not NPCIL sites. Your own site photos, where photography is permitted, would be more convincing to NPCIL readers.
+- **How the hero loop was made.** `nuclear-plant-slow.gif` (420 × 236 px, 10 fps, 5.3 MB) was upscaled 4× frame by frame with Real-ESRGAN (realesr-general-x4v3, medium denoise), motion-interpolated to 30 fps, and the last 1.5 s cross-dissolved into the start so it loops without a jump. It is served as a muted, autoplaying video rather than a GIF: it starts on first load exactly like a GIF but is a fraction of the size, and phones get a 720p version. The poster image is the loop's first frame, so the page looks the same before and after the video starts. A "Pause video" button and reduced-motion setting stop it.
+- **Replacing it with your own drone footage** (recommended: real NPCIL site footage, if filming is permitted). From a 1080p or 4K clip `in.mp4`, trimmed to 10 to 20 s:
+  ```bash
+  ffmpeg -i in.mp4 -an -vf "scale=1920:-2,fps=30" -c:v libx264 -crf 26 -preset slow -pix_fmt yuv420p -movflags +faststart assets/video/hero-aerial-1080.mp4
+  ffmpeg -i in.mp4 -an -vf "scale=1920:-2,fps=30" -c:v libvpx-vp9 -b:v 0 -crf 38 -row-mt 1 assets/video/hero-aerial-1080.webm
+  ffmpeg -i in.mp4 -an -vf "scale=1280:-2,fps=30" -c:v libx264 -crf 27 -preset slow -pix_fmt yuv420p -movflags +faststart assets/video/hero-aerial-720.mp4
+  ffmpeg -i in.mp4 -an -vf "scale=1280:-2,fps=30" -c:v libvpx-vp9 -b:v 0 -crf 39 -row-mt 1 assets/video/hero-aerial-720.webm
+  ffmpeg -i in.mp4 -vf "scale=1600:-2" -frames:v 1 -q:v 70 assets/video/hero-aerial-poster.webp
+  ```
+  Because media files are cached for 30 days, give replacements new names (e.g. `hero-aerial-v2-1080.mp4`) and update the `<source>` lines.
+- **Licences.** Check the source and licence of the two clips in use, `nuclear-plant-slow.gif` (hero) and `nuclear-plant-sr.gif` (sustainability section), before publishing. Upscaling doesn't change who owns the footage.
+- **Not used:** `nuclear-plant-90s.gif` shows an oil refinery with smokestacks, which undercuts the clean-energy message. The Freepik plant photo is no longer used, so it needs no credit.
+- Both clips show foreign stations, not NPCIL sites. Your own site photos, where photography is permitted, would be more convincing to NPCIL readers.
 
 ## 2. Preview locally
 

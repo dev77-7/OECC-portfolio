@@ -561,6 +561,32 @@
     vids.forEach(function (v) { io.observe(v); });
   }
 
+  /* Hero footage: autoplays muted on load. Stops for reduced-motion users, pauses while
+     scrolled out of view, and the button lets anyone stop it (WCAG 2.2.2). */
+  function initHeroVideo() {
+    var v = $('[data-hero-video]');
+    var btn = $('[data-hero-pause]');
+    if (!v) return;
+    var userPaused = reduceMotion;
+    function play() { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    function setPaused(paused) {
+      userPaused = paused;
+      if (paused) v.pause(); else play();
+      if (btn) {
+        btn.setAttribute('aria-pressed', String(paused));
+        btn.textContent = paused ? 'Play video' : 'Pause video';
+      }
+    }
+    if (reduceMotion) { v.removeAttribute('autoplay'); setPaused(true); }
+    if (btn) btn.addEventListener('click', function () { setPaused(!userPaused); });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        if (userPaused) return;
+        if (entries[0].isIntersecting) play(); else v.pause();
+      }).observe(v);
+    }
+  }
+
   function housekeeping() {
     $all('[data-year]').forEach(function (n) { n.textContent = new Date().getFullYear(); });
     var dim = $('[data-dimension]');
@@ -573,6 +599,7 @@
   function init() {
     housekeeping();
     initNav();
+    initHeroVideo();
     initCompare();
     initIndia();
     initDimension();
