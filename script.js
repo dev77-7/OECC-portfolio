@@ -654,6 +654,32 @@
     }
   }
 
+  /* Light/dark switch. With no saved choice the device setting decides; a click
+     picks the opposite of what's showing and remembers it for this visitor. */
+  function initTheme() {
+    var btn = $('[data-theme-toggle]');
+    if (!btn) return;
+    var root = document.documentElement;
+    var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+    function current() {
+      var t = root.getAttribute('data-theme');
+      return t || (mq && mq.matches ? 'dark' : 'light');
+    }
+    function sync() {
+      var dark = current() === 'dark';
+      btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+      btn.title = btn.getAttribute('aria-label');
+    }
+    btn.addEventListener('click', function () {
+      var next = current() === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('oecc-theme', next); } catch (e) { /* not saved; still switches */ }
+      sync();
+    });
+    if (mq && mq.addEventListener) mq.addEventListener('change', sync);
+    sync();
+  }
+
   function housekeeping() {
     $all('[data-year]').forEach(function (n) { n.textContent = new Date().getFullYear(); });
     var dim = $('[data-dimension]');
@@ -666,6 +692,7 @@
   function init() {
     housekeeping();
     initNav();
+    initTheme();
     initHeroVideo();
     initCompare();
     initIndia();

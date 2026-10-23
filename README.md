@@ -5,7 +5,8 @@ Static site for Om Engineering Construction Company (OECC). Plain HTML, CSS and 
 ```
 index.html            the page (5 sections: hero, sustainability, legacy, projects, contact)
 style.css             all styles
-script.js             charts, map/list linking, enquiry-form dialog, nav (no dependencies)
+script.js             charts, map/list linking, enquiry-form dialog, nav, dark-mode switch (no dependencies)
+theme.js              applies a saved light/dark choice before the page paints
 404.html              not-found page
 favicon.ico  robots.txt  sitemap.xml  site.webmanifest
 assets/fonts/         Archivo variable font (self-hosted, SIL Open Font License)
@@ -34,6 +35,8 @@ Until then the browser console shows a "failed to load" line per missing photo; 
 **Timeline.** The legacy section's dimension drawing reads its years from `data-founded="1984"`, `data-handover="2014"` (second generation joins), `data-leadership="2022"` and `data-now="2026"`. Change a year there and the "42 years" label and bar positions follow.
 
 **Enquiry form.** The button uses the short link `https://forms.gle/ohWZSvhMQYTB2mot7`, which opens the form in a new tab. To show the form inside the page instead, open the short link, copy the full `https://docs.google.com/forms/d/e/…/viewform` address from the browser bar and paste it into the button's `href`.
+
+**Dark mode.** The site follows each visitor's device setting (light or dark). The sun/moon button in the menu switches it and remembers the choice in that browser. All colours are tokens at the top of `style.css`: the light values in `:root`, the dark values in the "Dark mode" block just below it. `theme.js` loads before the stylesheet so a saved choice applies without a flash.
 
 **Reactor statuses.** Each project card lists its units with a status (operating, fuel loading, under construction, refurbishment, shut down), from `DATA.siteStatus` in `script.js`, dated by `DATA.statusAsOf`. Update a line there when NPCIL reports a change, e.g. when RAPP-8 enters commercial operation.
 
