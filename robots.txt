@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.oecc.co.in/sitemap.xml
+Sitemap: https://oeccpl.com/sitemap.xml

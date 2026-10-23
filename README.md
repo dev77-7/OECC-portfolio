@@ -15,20 +15,27 @@ assets/video/         hero-aerial-*: the hero loop (1080p and 720p, MP4 + WebM) 
 deploy/               EC2 setup, deploy script and nginx config (never uploaded to the web root)
 ```
 
-## 1. Before launch: fill these in
+## 1. Content and what's still to come
 
-Unfinished text is wrapped in `<span class="fill-in">[...]</span>` and shows with an orange underline. Replace each whole span with plain text. The browser console lists any that remain, and `deploy/deploy.sh` refuses to publish while any are left.
+All company details are filled in: founding year (1984), both generations, project scope per site, contact details, the `oeccpl.com` domain and the enquiry form. If any text is ever wrapped in `<span class="fill-in">[...]</span>`, it shows with an orange underline and `deploy/deploy.sh` refuses to publish until it's replaced.
 
-| Where (index.html) | What to add |
+**Leadership photos.** The "From the directors' desk" section shows the OECC mark in each frame until photos are added. Save each photo, cropped to portrait 4:5 (at least 800 × 1000 px, JPEG), with exactly these names, and the page picks them up with no code change:
+
+| Person | File |
 |---|---|
-| Hero title block, `Established` and `data-founded="1986"` on the dimension | Confirm the founding year. 1986 was worked out from "40 years". |
-| Legacy, `data-handover=""` | Year the second generation took over. The dimension line splits at this year. |
-| Legacy, first generation | Founder's name, first works, a short quote from the founder |
-| Legacy, second generation | Current leadership names, 3 real milestones |
-| Projects, each site card, "OECC's work" | Scope and years at that site (e.g. "Civil works, units 7 and 8, 2011 to 2018") |
-| Contact | Phone number and registered office address |
-| Contact, `href="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform"` | Your Google Form link (Google Forms: **Send** > link icon > copy). Until it is set, the button falls back to email. |
-| `<head>` canonical, `og:url`, `og:image`, JSON-LD, plus `robots.txt` and `sitemap.xml` | Your real domain, if it is not `www.oecc.co.in` |
+| Ram Niwas Sharma | `assets/img/team/ram-niwas-sharma.jpg` |
+| Sri Niwas Sharma | `assets/img/team/sri-niwas-sharma.jpg` |
+| Dheeraj Sharma | `assets/img/team/dheeraj-sharma.jpg` |
+| Pankaj Sharma | `assets/img/team/pankaj-sharma.jpg` |
+| Deepak Sharma | `assets/img/team/deepak-sharma.jpg` |
+
+Until then the browser console shows a "failed to load" line per missing photo; visitors don't see anything.
+
+**Timeline.** The legacy section's dimension drawing reads its years from `data-founded="1984"`, `data-handover="2014"` (second generation joins), `data-leadership="2022"` and `data-now="2026"`. Change a year there and the "42 years" label and bar positions follow.
+
+**Enquiry form.** The button uses the short link `https://forms.gle/ohWZSvhMQYTB2mot7`, which opens the form in a new tab. To show the form inside the page instead, open the short link, copy the full `https://docs.google.com/forms/d/e/…/viewform` address from the browser bar and paste it into the button's `href`.
+
+**Reactor statuses.** Each project card lists its units with a status (operating, fuel loading, under construction, refurbishment, shut down), from `DATA.siteStatus` in `script.js`, dated by `DATA.statusAsOf`. Update a line there when NPCIL reports a change, e.g. when RAPP-8 enters commercial operation.
 
 ### Hero video and other media
 
@@ -68,20 +75,20 @@ Checked October 2026 against AWS's own pricing pages.
 
 The site is the same files in every case, so you can start on EC2 and move later without changing anything.
 
-**Domain and DNS.** The old site used `info@oecc.co.in`, so you likely own `oecc.co.in`. Route 53 cannot register `.co.in`, but you can keep the domain where it is and add an `A` record (EC2) or `CNAME`/`ALIAS` (CloudFront) at your current registrar. That avoids Route 53's $0.50/month hosted-zone fee. "Amazon DNS" in the sense of the instance's `ec2-…amazonaws.com` name works for testing, but it is HTTP only: Let's Encrypt will not issue certificates for `amazonaws.com` names, so the live site needs your own domain.
+**Domain and DNS.** The site's domain is `oeccpl.com`. You can keep it with its current registrar and add an `A` record (EC2) or `CNAME`/`ALIAS` (CloudFront) at your current registrar. That avoids Route 53's $0.50/month hosted-zone fee. "Amazon DNS" in the sense of the instance's `ec2-…amazonaws.com` name works for testing, but it is HTTP only: Let's Encrypt will not issue certificates for `amazonaws.com` names, so the live site needs your own domain.
 
 ## 4. Deploy to EC2
 
 1. **Launch the instance.** EC2 console > Launch instance. Region: Asia Pacific (Mumbai) `ap-south-1`. AMI: Ubuntu Server 24.04 LTS. Type: a free-tier eligible size (`t3.micro`). Create a key pair and download the `.pem`. Security group: allow SSH (22) from **your IP only**, HTTP (80) and HTTPS (443) from anywhere.
 2. **Give it a fixed address.** EC2 > Elastic IPs > Allocate > Associate with the instance. Without this the IP changes every time the instance stops.
-3. **Point your domain** (skip to test on the EC2 name first): at your registrar, set `A` records for `oecc.co.in` and `www.oecc.co.in` to the Elastic IP.
+3. **Point your domain** (skip to test on the EC2 name first): at your registrar, set `A` records for `oeccpl.com` and `www.oeccpl.com` to the Elastic IP.
 4. **Copy the site and run setup**, from your computer:
    ```bash
    chmod 400 ~/Downloads/oecc-key.pem
    rsync -avz -e "ssh -i ~/Downloads/oecc-key.pem" ./ ubuntu@<ELASTIC-IP>:~/oecc-site/
    ssh -i ~/Downloads/oecc-key.pem ubuntu@<ELASTIC-IP>
    # on the server:
-   sudo bash ~/oecc-site/deploy/setup-ec2.sh oecc.co.in you@oecc.co.in   # with domain + HTTPS
+   sudo bash ~/oecc-site/deploy/setup-ec2.sh oeccpl.com deepak@oeccpl.com   # with domain + HTTPS
    # or: sudo bash ~/oecc-site/deploy/setup-ec2.sh                       # no domain yet, HTTP on the EC2 name
    ```
    The script installs nginx, copies the site to `/var/www/oecc`, installs the config with gzip, caching and security headers, and, with a domain, gets a Let's Encrypt certificate that renews itself.

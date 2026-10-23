@@ -77,6 +77,42 @@
     ],
     historyEnd: 2026,
 
+    /* Unit status at each OECC site, shown in the project cards. Checked against NPCIL and
+       PIB/World Nuclear News reports, October 2026. Update a line when a unit's status changes. */
+    statusAsOf: 'October 2026',
+    siteStatus: {
+      rr: [
+        ['RAPS-1', '100 MWe', 'shutdown'],
+        ['RAPS-2', '200 MWe', 'operating'],
+        ['RAPS-3 to 6', '4 × 220 MWe', 'operating'],
+        ['RAPP-7', '700 MWe, commercial operation April 2025', 'operating'],
+        ['RAPP-8', '700 MWe, fuel loading began September 2026', 'fuel']
+      ],
+      narora: [
+        ['NAPS-1 and 2', '2 × 220 MWe', 'operating']
+      ],
+      kakrapar: [
+        ['KAPS-1 and 2', '2 × 220 MWe', 'operating'],
+        ['KAPP-3 and 4', '2 × 700 MWe, commercial operation 2023 and 2024', 'operating']
+      ],
+      kudankulam: [
+        ['KKNPP-1 and 2', '2 × 1,000 MWe', 'operating'],
+        ['KKNPP-3 to 6', '4 × 1,000 MWe', 'construction']
+      ],
+      kaiga: [
+        ['KGS-1', '220 MWe, refuelled September 2026 after coolant channel replacement', 'refurb'],
+        ['KGS-2 to 4', '3 × 220 MWe', 'operating'],
+        ['KGS-5 and 6', '2 × 700 MWe, first concrete March 2026', 'construction']
+      ]
+    },
+    statusLabels: {
+      operating: 'Operating',
+      fuel: 'Fuel loading',
+      construction: 'Under construction',
+      refurb: 'Refurbishment',
+      shutdown: 'Shut down'
+    },
+
     targets: [
       { label: 'Installed today', value: 8.78, kind: 'actual' },
       { label: 'Target 2031–32', value: 22.38, kind: 'target' },
@@ -459,19 +495,41 @@
     if (!dim) return;
     var founded = parseInt(dim.getAttribute('data-founded'), 10);
     var now = parseInt(dim.getAttribute('data-now'), 10) || new Date().getFullYear();
-    var handover = parseInt(dim.getAttribute('data-handover'), 10);
-    var known = !isNaN(handover) && handover > founded && handover < now;
-    var share = known ? (handover - founded) / (now - founded) : 0.6;
-    $('.dim-seg-1', dim).style.flexBasis = (share * 100) + '%';
-    $('.dim-seg-2', dim).style.flexBasis = ((1 - share) * 100) + '%';
-    var years = now - founded;
-    $('.dim-label strong', dim).textContent = years + ' years';
+    var joined = parseInt(dim.getAttribute('data-handover'), 10);
+    var lead = parseInt(dim.getAttribute('data-leadership'), 10);
+    var rows = $('.dim-rows', dim);
+    var span = now - founded;
+    $('.dim-label strong', dim).textContent = span + ' years';
     $('[data-year-founded]', dim).textContent = founded;
-    var hy = $('[data-year-handover]', dim);
-    if (known) { hy.textContent = handover; hy.classList.remove('fill-in'); }
-    else { hy.textContent = '[year]'; hy.classList.add('fill-in'); }
-    dim.setAttribute('aria-label', years + ' years, ' + founded + ' to today: first generation from ' + founded +
-      (known ? ', second generation from ' + handover : ', then the second generation') + ' to today');
+    if (!isNaN(joined) && joined > founded && joined < now) {
+      rows.style.setProperty('--start', ((joined - founded) / span * 100) + '%');
+      $('[data-year-handover]', dim).textContent = joined;
+      var mark = $('[data-mark-leadership]', dim);
+      if (!isNaN(lead) && lead > joined && lead < now) {
+        rows.style.setProperty('--lead', ((lead - joined) / (now - joined) * 100) + '%');
+        $('[data-year-leadership]', dim).textContent = lead;
+      } else if (mark) {
+        mark.hidden = true;
+      }
+    }
+  }
+
+  /* ---------------------------------------------------------
+     3b. LEADERSHIP — photos appear once the files exist
+     --------------------------------------------------------- */
+  function initPeople() {
+    $all('[data-photo]').forEach(function (frame) {
+      var src = frame.getAttribute('data-photo');
+      var img = new Image();
+      img.onload = function () {
+        img.alt = 'Portrait of ' + (frame.getAttribute('data-name') || '');
+        img.width = 400; img.height = 500;
+        img.decoding = 'async';
+        frame.appendChild(img);
+        frame.classList.add('has-photo');
+      };
+      img.src = src;
+    });
   }
 
   /* ---------------------------------------------------------
@@ -504,6 +562,22 @@
       mk.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
     });
     activate(cards[0].getAttribute('data-site'));
+
+    // Replace each card's plain "Units" text with the unit-by-unit status list.
+    Object.keys(DATA.siteStatus).forEach(function (id) {
+      var dd = $('[data-units="' + id + '"]');
+      if (!dd) return;
+      dd.textContent = '';
+      var ul = h('ul', { class: 'unit-list' }, dd);
+      DATA.siteStatus[id].forEach(function (u) {
+        var li = h('li', null, ul);
+        var name = h('span', { class: 'unit-name' }, li);
+        h('strong', { text: u[0] }, name);
+        name.appendChild(document.createTextNode(', ' + u[1]));
+        h('span', { class: 'unit-status unit-' + u[2], text: DATA.statusLabels[u[2]] }, li);
+      });
+      h('p', { class: 'unit-asof', text: 'Status as of ' + DATA.statusAsOf }, dd);
+    });
   }
 
   /* ---------------------------------------------------------
@@ -514,10 +588,12 @@
     var dialog = $('[data-form-dialog]');
     if (!opener) return;
     var url = opener.getAttribute('href') || '';
-    var configured = /docs\.google\.com\/forms\//.test(url) && url.indexOf('YOUR_FORM_ID') === -1;
-    if (!configured) {
-      // No form linked yet: send people to email instead of a broken link.
-      opener.setAttribute('href', 'mailto:info@oecc.co.in?subject=Enquiry%20from%20website');
+    var shortLink = /^https:\/\/forms\.gle\//.test(url);
+    var fullLink = /docs\.google\.com\/forms\//.test(url) && url.indexOf('YOUR_FORM_ID') === -1;
+    if (shortLink) return; // short links can't be embedded: the button opens the form in a new tab
+    if (!fullLink) {
+      // No form linked: send people to email instead of a broken link.
+      opener.setAttribute('href', 'mailto:deepak@oeccpl.com?subject=Enquiry%20from%20website');
       opener.removeAttribute('target');
       console.warn('[OECC] Google Form link not set. Paste it into the "Open the enquiry form" button in index.html.');
       return;
@@ -594,6 +670,7 @@
     initCompare();
     initIndia();
     initDimension();
+    initPeople();
     initProjects();
     initForm();
     initLazyVideo();

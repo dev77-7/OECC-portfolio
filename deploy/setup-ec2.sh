@@ -3,9 +3,9 @@
 #
 # Run ON THE SERVER, from the folder you copied the site into:
 #   sudo bash deploy/setup-ec2.sh                                  # no domain yet: serves on the EC2 public DNS over HTTP
-#   sudo bash deploy/setup-ec2.sh oecc.co.in admin@oecc.co.in      # with a domain: also gets a free Let's Encrypt certificate
+#   sudo bash deploy/setup-ec2.sh oeccpl.com deepak@oeccpl.com      # with a domain: also gets a free Let's Encrypt certificate
 #
-# For the HTTPS step, the domain's A records (oecc.co.in and www.oecc.co.in) must already
+# For the HTTPS step, the domain's A records (oeccpl.com and www.oeccpl.com) must already
 # point at this instance's Elastic IP, and the security group must allow ports 80 and 443.
 set -euo pipefail
 

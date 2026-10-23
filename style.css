@@ -619,54 +619,74 @@ p { text-wrap: pretty; }
 }
 .dim-label strong { font-weight: inherit; }
 
-.dim-chain { display: flex; position: relative; }
-.dim-seg {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  padding-bottom: 2.4rem;
-  min-height: 4.4rem;
-}
-/* the chained dimension line sits under the label, years hang below it */
-.dim-seg::before {
-  content: "";
+/* Generation rows under the overall dimension. Both bars run to today;
+   --start (2014) and --lead (2022, as a share of the second bar) are set by script.js. */
+.dim-rows { position: relative; --start: 71.43%; --lead: 66.67%; }
+.dim-row { position: relative; height: 3.6rem; }
+.dim-bar {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 1.85rem;
-  border-top: 1px solid var(--dim-ink);
+  bottom: 0.9rem;
+  height: 6px;
+  background: var(--dim-ink);
 }
-.dim-seg::after,
-.dim-chain::after {
-  content: "";
+.dim-row-2 .dim-bar { left: var(--start); background: #B85A08; }
+.dim-row-label {
   position: absolute;
-  bottom: 1.85rem;
-  width: 16px;
-  border-top: 2px solid var(--dim-ink);
-}
-.dim-seg::after { left: 0; transform: translate(-50%, 50%) rotate(-45deg); }
-.dim-chain::after { right: 0; transform: translate(50%, 50%) rotate(-45deg); }
-.dim-seg-2 { border-left: 1px solid var(--dim-ink); }
-.dim-seg-label {
+  left: 0;
+  bottom: 1.45rem;
   font-size: var(--step-0);
   font-weight: 650;
   font-stretch: 112%;
   line-height: 1.2;
-  text-align: center;
-  padding: 0 0.5rem 0.45rem;
+  white-space: nowrap;
 }
-.dim-seg-2 .dim-seg-label { color: #9a4c05; }
-.dim-year {
+/* second label sits just left of its bar, level with it */
+.dim-row-2 .dim-row-label {
+  left: auto;
+  right: calc(100% - var(--start) + 0.75rem);
+  bottom: 0.55rem;
+  color: #9a4c05;
+}
+.dim-mark {
   position: absolute;
-  bottom: 0.35rem;
+  left: var(--lead);
+  bottom: -6px;
+  height: 22px;
+  border-left: 2px solid var(--dim-ink);
+}
+.dim-mark span {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  transform: translateX(-50%);
+  padding-bottom: 0.15rem;
+  font-size: var(--step--1);
+  font-weight: 650;
+  white-space: nowrap;
+}
+/* extension line dropping from the 2014 start to the year row */
+.dim-rows::after {
+  content: "";
+  position: absolute;
+  left: var(--start);
+  top: 3.6rem;
+  bottom: 0.2rem;
+  border-left: 1px solid var(--dim-ink);
+}
+.dim-years { position: relative; height: 1.6rem; }
+.dim-years span {
+  position: absolute;
+  top: 0.15rem;
   font-size: var(--step--1);
   font-weight: 600;
   color: var(--ink-2);
   white-space: nowrap;
 }
-.dim-year-start { left: 0.5rem; }
-.dim-year-end { right: 0.5rem; }
+.dim-years span:nth-child(1) { left: 0.5rem; }
+.dim-years span:nth-child(2) { left: calc(var(--start) + 0.5rem); }
+.dim-years span:nth-child(3) { right: 0.5rem; }
 
 .generations {
   display: grid;
@@ -675,29 +695,90 @@ p { text-wrap: pretty; }
 }
 .gen h3 { font-size: var(--step-3); margin-bottom: 1rem; }
 .gen p { max-width: 36rem; color: var(--ink-2); }
-.gen-quote {
-  margin-top: 1.75rem;
-  padding-left: 1.25rem;
-  border-left: 3px solid var(--oecc-blue);
-}
-.gen-quote p { font-size: var(--step-1); line-height: 1.45; color: var(--ink); }
-.gen-quote footer { margin-top: 0.6rem; font-size: var(--step--1); color: var(--ink-3); }
 .gen-points {
-  margin-top: 1.5rem;
+  margin-top: clamp(2rem, 4vw, 3rem);
   padding: 0;
   list-style: none;
-  border-top: 1px solid var(--line);
+  max-width: 46rem;
+  border-top: 1.5px solid var(--ink);
 }
 .gen-points li {
-  padding: 0.75rem 0;
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 1rem;
+  padding: 0.8rem 0;
   border-bottom: 1px solid var(--line);
 }
+.gen-year { font-weight: 750; font-stretch: 112%; font-variant-numeric: tabular-nums; }
 @media (max-width: 760px) {
   .generations { grid-template-columns: 1fr; }
-  .dim-seg-label { font-size: var(--step--1); }
+  .dim-row-label { font-size: var(--step--1); }
 }
 
-/* ---------- 4. Projects ---------- */
+/* ---------- Leadership ---------- */
+.section-leadership { background: var(--concrete); }
+.people { border-top: 1.5px solid var(--ink); }
+.people-group {
+  font-size: var(--step-1);
+  font-stretch: 112%;
+  font-weight: 700;
+  color: var(--ink-3);
+  padding: 1.75rem 0 0.25rem;
+}
+.person {
+  display: grid;
+  grid-template-columns: 9.5rem 13rem minmax(0, 1fr);
+  grid-template-areas: "photo id quote";
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: start;
+  margin: 0;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.person-photo {
+  grid-area: photo;
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+/* until a photo is added: the OECC mark, greyed back */
+.person-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("assets/img/logo-192.png") center / 46% no-repeat;
+  filter: grayscale(1);
+  opacity: 0.28;
+}
+.person-photo.has-photo::before { display: none; }
+.person-photo img { width: 100%; height: 100%; object-fit: cover; }
+.person-id { grid-area: id; display: flex; flex-direction: column; gap: 0.25rem; padding-top: 0.15rem; }
+.person-name {
+  font-size: var(--step-2);
+  font-weight: 750;
+  font-stretch: 112%;
+  line-height: 1.15;
+}
+.person-role { font-size: var(--step--1); color: var(--ink-3); }
+.person-quote { grid-area: quote; margin: 0; }
+.person-quote p {
+  max-width: 40rem;
+  font-size: var(--step-1);
+  line-height: 1.5;
+  text-indent: -0.42em; /* hang the opening quote mark */
+}
+@media (max-width: 760px) {
+  .person {
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    grid-template-areas: "photo id" "quote quote";
+    gap: 1rem 1.25rem;
+  }
+  .person-quote p { font-size: var(--step-0); }
+}
+
+/* ---------- 5. Projects ---------- */
 .section-projects {
   background-color: var(--blueprint);
   /* drafting grid, as on a blueprint sheet */
@@ -785,7 +866,30 @@ p { text-wrap: pretty; }
 }
 .site-facts dt { color: var(--blueprint-ink-2); }
 .site-facts dd { color: var(--blueprint-ink); }
-.site .fill-in { background: rgba(224, 120, 24, 0.22); }
+.unit-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.35rem; }
+.unit-list li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+}
+.unit-name strong { font-weight: 650; color: #fff; }
+.unit-status {
+  font-size: 0.75rem;
+  font-weight: 650;
+  line-height: 1.5;
+  padding: 0 0.45rem;
+  border-radius: 2px;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.unit-operating { background: rgba(207, 230, 243, 0.16); color: var(--blueprint-ink); }
+.unit-fuel { border-color: var(--orange); color: #FFC48C; }
+.unit-construction { border-color: rgba(207, 230, 243, 0.55); color: var(--blueprint-ink); }
+.unit-refurb { border-color: rgba(255, 196, 140, 0.55); color: #FFC48C; }
+.unit-shutdown { color: var(--blueprint-ink-2); border-color: rgba(157, 191, 211, 0.3); }
+.unit-asof { margin-top: 0.45rem; font-size: 0.75rem; color: var(--blueprint-ink-2); }
 
 @media (max-width: 860px) {
   .map-site text { font-size: 44px; stroke-width: 9px; }
@@ -868,6 +972,10 @@ p { text-wrap: pretty; }
   font-size: var(--step--1);
 }
 .footer-inner { display: grid; gap: 0.5rem; }
+.footer-art { margin-bottom: 1.25rem; }
+.footer-art img { width: min(100%, 24rem); height: auto; }
+.footer-contact { color: rgba(255, 255, 255, 0.86); }
+.site-footer a { color: #fff; }
 .footer-small { color: rgba(255, 255, 255, 0.58); font-size: 0.8125rem; max-width: 60rem; }
 
 /* ---------- Reduced motion ---------- */
